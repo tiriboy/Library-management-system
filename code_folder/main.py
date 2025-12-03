@@ -1,9 +1,13 @@
 import books
+import users
 import os
+
 
 def main():
     choice = ''
     book_list = []
+    user_list = []
+
     with open("data_folder/books.txt", "r") as f:
         if os.path.getsize("data_folder/books.txt") != 0:
             for line in f:
@@ -12,6 +16,14 @@ def main():
                 book.checked_out = checked_out == 'Checked out'
                 book.id = int(id)
                 book_list.append(book)
+
+    with open("data_folder/users.txt", "r") as f:
+        if os.path.getsize("data_folder/users.txt") != 0:
+            for line in f:
+                id,user_name, full_name, phone_number, email = line.strip().split(',')
+                user = users.create_user(user_name, full_name, phone_number, email)
+                user.id = int(id)
+                user_list.append(user)            
     
     while choice != '0':
         print("\nLibrary Management System")
@@ -24,6 +36,11 @@ def main():
         print("7. Update Book Information")
         print("8. Search Book")
         print("9. Delete Book")
+        print("10. Add User")
+        print("11. List All Users")
+        print("12. Update User Information")
+        print("13. Search User")
+        print("14. Delete User")
         print("0. Exit")
         print("\n")
         choice = input("Enter your choice: ")
@@ -152,7 +169,76 @@ def main():
                         f.write(b.book_info() + '\n')
             else:
                 print(f"Book with ID: {book_id} not found.")
+        elif choice == '10':
+            user_name = input("Enter username: ")
+            full_name = input("Enter full name: ")
+            phone_number = input("Enter phone number: ")
+            email = input("Enter email: ")
+            new_user = users.create_user(user_name, full_name, phone_number, email)
+            user_list.append(new_user)
+            with open("data_folder/users.txt", "a") as f:
+                f.write(new_user.get_info() + '\n')
+            print(f"User '{user_name}' added successfully.")
 
+        elif choice == '11':
+            print("\nAll Users:")
+            print("ID               Username                       Full Name                     Phone Number                 Email                         ")
+            print("-" * 150)
+            users.list_users(user_list)
+
+        elif choice == '12':
+            user_id = int(input("Enter the ID of the user to update: "))
+            found = False
+            for user in user_list:
+                if user.id == user_id:
+                    user_name = input("Enter new username (leave blank to keep current): ")
+                    full_name = input("Enter new full name (leave blank to keep current): ")
+                    phone_number = input("Enter new phone number (leave blank to keep current): ")
+                    email = input("Enter new email (leave blank to keep current): ")
+                    user.update_info(
+                        user_name=user_name if user_name else None,
+                        full_name=full_name if full_name else None,
+                        phone_number=phone_number if phone_number else None,
+                        email=email if email else None
+                    )
+                    found = True
+                    break
+            if not found:
+                print(f"User with ID '{user_id}' not found in the system.")
+                return
+            with open("data_folder/users.txt", "w") as f:
+                    for u in user_list:
+                        f.write(u.get_info() + '\n')
+
+        elif choice == '13':
+            user_id = int(input('Enter the ID of the user to be searched: '))
+            found = False
+            for user in user_list:
+                if user.id == user_id:
+                    found = True
+                    print("User details: ")
+                    print(f"ID: {user.id}\nUsername: {user.user_name}\nFull Name: {user.full_name}\nPhone Number: {user.phone_number}\nEmail: {user.email}\n")
+                    break
+            if not found: 
+                print(f"User with ID: {user_id} not found")    
+
+        elif choice == '14':
+            user_id = int(input("Enter the ID of the user to delete: "))
+            found = False
+            for user in user_list:
+                if user.id == user_id:
+                    user_list.remove(user)
+                    found = True
+                    break
+            if found:
+                print(f"User with ID: {user_id} has been deleted.")
+                with open("data_folder/users.txt", "w") as f:
+                    for u in user_list:
+                        f.write(u.get_info() + '\n')
+            else:
+                print(f"User with ID: {user_id} not found.")
+
+        
         elif choice == '0':
             print("Exiting the system. Goodbye!")
 
