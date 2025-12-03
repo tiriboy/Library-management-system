@@ -1,5 +1,6 @@
 import books
 import users
+import borrowers_list
 import os
 
 
@@ -78,43 +79,15 @@ def main():
 
         elif choice == '5':
             book_id = int(input("Enter the ID of the book to check out: "))
-            found = False
-            for book in book_list:
-                if book.id == book_id:
-                    if not book.is_checked_out():
-                        book.checked_out = True
-                        print(f"You have checked out '{book.title}'.")
-                        found = True
-                        break
-                    else:
-                        print(f"Sorry, '{book.title}' is already checked out.")
-                        found = True
-                        break   
-            if not found:
-                print(f"Book with ID '{book_id}' not found in the library.")
-            with open("data_folder/books.txt", "w") as f:
-                    for b in book_list:
-                        f.write(b.book_info() + '\n') 
+            user_id = int(input("Enter your borrower's ID: "))
+            message = borrowers_list.checkout_book(user_id = user_id, book_id = book_id, user_list = user_list, book_list = book_list)
+            print(message)
 
         elif choice == '6':
             book_id = int(input("Enter the ID of the book to return: "))
-            found = False
-            for book in book_list:
-                if book.id == book_id:
-                    if book.is_checked_out():
-                        book.checked_out = False
-                        print(f"You have returned '{book.title}'.")
-                        found = True
-                        break
-                    else:
-                        print(f"'{book.title}' was not checked out.")
-                        found = True
-                        break   
-            if not found:
-                print(f"Book with ID '{book_id}' not found in the library.")
-            with open("data_folder/books.txt", "w") as f:
-                    for b in book_list:
-                        f.write(b.book_info() + '\n')
+            user_id = int(input("Enter your borrower's ID: "))
+            message = borrowers_list.return_book(user_id = user_id, book_id = book_id, book_list = book_list)
+            print(message)
         
         elif choice == '7':
             book_id = int(input("Enter the ID of the book to update: "))
